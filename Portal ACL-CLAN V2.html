@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ACL Portal - Secure Ecosystem</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap');
+        
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: #020617;
+            color: #f8fafc;
+            min-height: 100vh;
+            padding-bottom: 100px;
+        }
+
+        .glass-container {
+            background: rgba(15, 23, 42, 0.7);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 2rem;
+        }
+
+        .nav-item.active {
+            color: #38bdf8;
+            transform: translateY(-5px);
+        }
+
+        .page-content {
+            display: none;
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        .page-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        #id-card-render {
+            width: 400px;
+            height: 240px;
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            border: 2px solid #38bdf8;
+            position: relative;
+            overflow: hidden;
+            border-radius: 15px;
+            padding: 24px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        }
+
+        .admin-card { border-color: #10b981 !important; background: linear-gradient(135deg, #064e3b 0%, #020617 100%) !important; }
+        .owner-card { border-color: #f59e0b !important; background: linear-gradient(135deg, #78350f 0%, #020617 100%) !important; }
+
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
+        
+        .scanner-line {
+            position: absolute;
+            width: 100%;
+            height: 2px;
+            background: #38bdf8;
+            box-shadow: 0 0 15px #38bdf8;
+            top: 0;
+            left: 0;
+            animation: scan 2s linear infinite;
+            display: none;
+            z-index: 50;
+        }
+        @keyframes scan {
+            0% { top: 0; }
+            100% { top: 100%; }
+        }
+
+        .feed-card {
+            border-left: 4px solid #38bdf8;
+            transition: all 0.3s ease;
+        }
+        .feed-card:hover { transform: translateX(5px); }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header class="p-6 text-center sticky top-0 bg-[#020617]/80 backdrop-blur-md z-40">
+        <h1 class="text-3xl font-extrabold tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-sky-400 via-indigo-500 to-emerald-500">
+            ACL SYSTEM
+        </h1>
+        <p id="page-title" class="text-slate-400 text-[9px] mt-1 uppercase tracking-[0.4em] font-black">Secure Management</p>
+    </header>
+
+    <main class="max-w-xl mx-auto px-4 pb-24">
+
+        <!-- HALAMAN 1: PENDAFTARAN -->
+        <div id="page-intro" class="page-content active">
+            <div class="glass-container p-6 mb-6">
+                <div class="flex items-center gap-3 mb-6">
+                    <div class="p-2 bg-sky-400/10 rounded-lg text-sky-400">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                    </div>
+                    <h2 class="text-xl font-bold">Pendaftaran Member</h2>
+                </div>
+                
+                <div class="space-y-4">
+                    <input type="text" id="reg-nama" class="w-full bg-slate-900/50 border border-slate-700 rounded-xl p-4 focus:border-sky-500 outline-none" placeholder="Nama Lengkap">
+                    <div class="grid grid-cols-2 gap-4">
+                        <input type="text" id="reg-askot" class="w-full bg-slate-900/50 border border-slate-700 rounded-xl p-4 focus:border-sky-500 outline-none" placeholder="Asal Kota">
+                        <input type="number" id="reg-umur" class="w-full bg-slate-900/50 border border-slate-700 rounded-xl p-4 focus:border-sky-500 outline-none" placeholder="Umur">
+                    </div>
+                    <select id="reg-gender" class="w-full bg-slate-900/50 border border-slate-700 rounded-xl p-4 focus:border-sky-500 outline-none">
+                        <option value="Cwo">Cwo</option>
+                        <option value="Cwe">Cwe</option>
+                    </select>
+                    <textarea id="reg-anime" rows="2" class="w-full bg-slate-900/50 border border-slate-700 rounded-xl p-4 focus:border-sky-500 outline-none" placeholder="Anime favorit..."></textarea>
+                    <div class="flex items-start gap-3 p-4 bg-rose-500/5 border border-rose-500/20 rounded-xl">
+                        <input type="checkbox" id="reg-konsekuensi" class="mt-1">
+                        <label for="reg-konsekuensi" class="text-[10px] text-slate-400 leading-tight">Siap menerima konsekuensi jika melanggar aturan.</label>
+                    </div>
+                    <button onclick="generateIntroText()" class="w-full bg-sky-600 hover:bg-sky-500 text-white font-black py-4 rounded-2xl shadow-lg transition-all active:scale-95">
+                        GENERATE DATA INTRO
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- HALAMAN 2: PEMBUAT ID CARD -->
+        <div id="page-idcard" class="page-content">
+             <div class="glass-container p-6 mb-6 text-center">
+                <h2 class="text-xl font-bold mb-6 italic tracking-widest uppercase">Identity Creator</h2>
+                <div class="flex p-1 bg-black/40 rounded-2xl border border-slate-800 mb-6 gap-1">
+                    <button onclick="setRole('MEMBER')" id="role-member" class="flex-1 py-3 rounded-xl text-[9px] font-black transition-all bg-slate-700 text-white">MEMBER</button>
+                    <button onclick="setRole('ADMIN')" id="role-admin" class="flex-1 py-3 rounded-xl text-[9px] font-black transition-all text-slate-500">ADMIN</button>
+                    <button onclick="setRole('OWNER')" id="role-owner" class="flex-1 py-3 rounded-xl text-[9px] font-black transition-all text-slate-500">OWNER</button>
+                </div>
+                <input type="text" id="card-nama" oninput="updateCardPreview()" class="w-full bg-slate-900/50 border border-slate-700 rounded-xl p-4 outline-none focus:border-sky-500 uppercase font-bold mb-4" placeholder="Nama Lengkap Kartu">
+                <div id="secure-auth" class="hidden mb-4">
+                    <input type="password" id="acl-code" class="w-full bg-black/50 border border-slate-700 rounded-xl p-4 text-sm outline-none" placeholder="Masukkan Passcode Otoritas">
+                </div>
+                <div class="flex justify-center py-4 scale-90">
+                    <div id="id-card-render">
+                        <div class="scanner-line" id="scanner-line-card"></div>
+                        <div class="h-full flex flex-col relative z-10 text-left">
+                            <div class="mb-4">
+                                <div class="text-sky-400 font-black text-2xl italic tracking-tighter">ACL CLAN</div>
+                                <div class="w-10 h-1 bg-sky-500 mt-1"></div>
+                            </div>
+                            <div class="flex-1 flex flex-col justify-center">
+                                <div id="preview-rank" class="text-[10px] text-sky-400 font-bold tracking-[0.2em] mb-1">MEMBER ACCESS</div>
+                                <div id="preview-nama" class="text-2xl font-extrabold tracking-tight uppercase">IDENTITY</div>
+                            </div>
+                            <div id="preview-uid" class="text-[7px] text-slate-500 font-mono tracking-tighter">UID-ACL-TEMP</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex gap-2">
+                    <button onclick="downloadCard()" class="flex-1 bg-white text-black font-black py-4 rounded-2xl text-xs">CETAK KARTU</button>
+                    <button onclick="saveToDatabase()" class="px-6 bg-slate-800 rounded-2xl border border-slate-700 text-sky-500 font-bold">SIMPAN</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- HALAMAN 3: FEED / SHARING -->
+        <div id="page-feed" class="page-content">
+            <div id="feed-auth-screen" class="glass-container p-10 text-center">
+                <div class="mb-6 inline-flex p-5 bg-sky-500/10 rounded-full text-sky-500">
+                    <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z"></path></svg>
+                </div>
+                <h2 class="text-xl font-black mb-2 uppercase">ACL FEED</h2>
+                <p class="text-[9px] text-slate-500 uppercase tracking-widest mb-8">Login dengan ID Card untuk Posting</p>
+                <label class="w-full flex items-center justify-center gap-3 bg-sky-500 text-white py-4 rounded-2xl cursor-pointer hover:bg-sky-400 transition-all">
+                    <span class="text-[10px] font-black uppercase">Pindai Kartu Anda</span>
+                    <input type="file" id="feed-login-input" class="hidden" accept="image/*" onchange="loginFeed()">
+                </label>
+            </div>
+
+            <div id="feed-main-content" class="hidden space-y-4">
+                <div class="glass-container p-6 border-sky-500/30">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center gap-2">
+                            <div id="user-avatar" class="w-8 h-8 rounded-full bg-sky-500 flex items-center justify-center text-[10px] font-bold">A</div>
+                            <div>
+                                <p id="logged-user-name" class="text-[10px] font-black uppercase tracking-tight">USERNAME</p>
+                                <p id="logged-user-role" class="text-[7px] text-sky-400 font-bold uppercase">ROLE</p>
+                            </div>
+                        </div>
+                        <button onclick="logoutFeed()" class="text-[8px] text-rose-500 font-black uppercase">Logout</button>
+                    </div>
+                    <textarea id="feed-post-text" rows="3" class="w-full bg-black/40 border border-slate-700 rounded-xl p-4 text-xs outline-none focus:border-sky-500" placeholder="Apa yang ingin kamu bagikan ke Clan?"></textarea>
+                    <button onclick="postToFeed()" class="w-full mt-3 bg-white text-black font-black py-3 rounded-xl text-[10px] uppercase">Posting Ke Feed</button>
+                </div>
+
+                <div id="feed-items-container" class="space-y-4"></div>
+            </div>
+        </div>
+
+        <!-- HALAMAN 4: DATABASE AMAN -->
+        <div id="page-list" class="page-content">
+            <div id="list-lock-screen" class="glass-container p-10 text-center">
+                <div class="mb-6 inline-flex p-5 bg-rose-500/10 rounded-full text-rose-500">
+                    <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                </div>
+                <h2 class="text-xl font-black mb-2 uppercase">SECURE DATABASE</h2>
+                <p class="text-[9px] text-slate-500 uppercase tracking-widest mb-8">Pindai ID Card Admin/Owner</p>
+                <label class="w-full flex items-center justify-center gap-3 bg-white text-black py-4 rounded-2xl cursor-pointer">
+                    <span class="text-[10px] font-black uppercase">Mulai Pemindaian</span>
+                    <input type="file" id="scan-input" class="hidden" accept="image/*" onchange="loginSecureList()">
+                </label>
+            </div>
+
+            <div id="list-content" class="hidden">
+                <div class="glass-container p-6 mb-4">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-xl font-black italic text-emerald-500">ARCHIVE DATA</h2>
+                        <button onclick="lockSystem()" class="p-2 bg-rose-500/10 text-rose-500 rounded-lg">KUNCI</button>
+                    </div>
+                    <div id="member-items" class="space-y-3 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar"></div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Navigation -->
+    <nav class="fixed bottom-0 left-0 right-0 bg-[#020617]/95 backdrop-blur-2xl border-t border-slate-800/50 px-4 py-4 flex justify-around items-center z-50">
+        <button onclick="switchPage('intro')" id="nav-intro" class="nav-item active flex flex-col items-center gap-1">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+            <span class="text-[7px] font-black uppercase">Daftar</span>
+        </button>
+        <button onclick="switchPage('idcard')" id="nav-idcard" class="nav-item flex flex-col items-center gap-1">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2M15 11h3m-3 4h2"></path></svg>
+            <span class="text-[7px] font-black uppercase">Card</span>
+        </button>
+        <button onclick="switchPage('feed')" id="nav-feed" class="nav-item flex flex-col items-center gap-1">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10l4 4v10a2 2 0 01-2 2zM7 8h4m-4 4h8m-8 4h8"></path></svg>
+            <span class="text-[7px] font-black uppercase">Feed</span>
+        </button>
+        <button onclick="switchPage('list')" id="nav-list" class="nav-item flex flex-col items-center gap-1">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+            <span class="text-[7px] font-black uppercase">Secure</span>
+        </button>
+    </nav>
+
+    <!-- Modal Output -->
+    <div id="modal" class="fixed inset-0 bg-black/95 hidden items-center justify-center p-6 z-[100]">
+        <div class="glass-container p-6 w-full max-w-sm">
+            <h3 class="text-xl font-black mb-4 text-sky-400 italic">DATA GENERATED</h3>
+            <pre id="result-text" class="bg-black/40 p-5 rounded-2xl text-[10px] whitespace-pre-wrap font-mono mb-6 border border-slate-800"></pre>
+            <button onclick="closeModal()" class="w-full py-4 bg-sky-600 rounded-xl font-black text-[10px] uppercase">Tutup</button>
+        </div>
+    </div>
+
+    <script>
+        const CODES = { 
+            ADMIN: "ADM-99-ALPHA", 
+            OWNER: "OWN-GTNG-22" 
+        };
+
+        let currentRole = 'MEMBER';
+        let memberDatabase = JSON.parse(localStorage.getItem('acl_members')) || [];
+        let feedDatabase = JSON.parse(localStorage.getItem('acl_feed')) || [];
+        let sessionUser = null;
+        let activeAuthority = null;
+
+        function switchPage(id) {
+            document.querySelectorAll('.page-content').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            document.getElementById('page-' + id).classList.add('active');
+            document.getElementById('nav-' + id).classList.add('active');
+            document.getElementById('page-title').innerText = id.toUpperCase() + ' PORTAL';
+            if(id === 'feed' && sessionUser) renderFeed();
+        }
+
+        // --- SISTEM LOGIN & SCANNING ---
+        function loginFeed() {
+            if(memberDatabase.length === 0) return alert("Database Kosong! Buat ID Card Anda terlebih dahulu.");
+            
+            const matchedUser = memberDatabase[Math.floor(Math.random() * memberDatabase.length)];
+            const label = event.target.parentElement;
+            label.innerText = "Processing ID Card...";
+            
+            setTimeout(() => {
+                sessionUser = matchedUser;
+                document.getElementById('feed-auth-screen').classList.add('hidden');
+                document.getElementById('feed-main-content').classList.remove('hidden');
+                document.getElementById('logged-user-name').innerText = sessionUser.name;
+                document.getElementById('logged-user-role').innerText = sessionUser.role;
+                document.getElementById('user-avatar').innerText = sessionUser.name[0];
+                renderFeed();
+                label.innerHTML = `<span class="text-[10px] font-black uppercase">Pindai Kartu Anda</span>`;
+            }, 1500);
+        }
+
+        function loginSecureList() {
+            if(memberDatabase.length === 0) return alert("Belum ada data di database.");
+            const authUser = memberDatabase.find(m => m.role === 'ADMIN' || m.role === 'OWNER');
+            
+            if(authUser) {
+                activeAuthority = authUser;
+                document.getElementById('list-lock-screen').classList.add('hidden');
+                document.getElementById('list-content').classList.remove('hidden');
+                renderSecureList();
+            } else {
+                alert("Akses Ditolak! Gunakan ID Card dengan otoritas ADMIN atau OWNER.");
+            }
+        }
+
+        function logoutFeed() {
+            sessionUser = null;
+            document.getElementById('feed-auth-screen').classList.remove('hidden');
+            document.getElementById('feed-main-content').classList.add('hidden');
+        }
+
+        function lockSystem() {
+            activeAuthority = null;
+            document.getElementById('list-lock-screen').classList.remove('hidden');
+            document.getElementById('list-content').classList.add('hidden');
+        }
+
+        // --- FEED LOGIC ---
+        function postToFeed() {
+            const text = document.getElementById('feed-post-text').value;
+            if(!text.trim()) return;
+            
+            const post = {
+                id: Date.now(),
+                user: sessionUser.name,
+                role: sessionUser.role,
+                content: text,
+                time: new Date().toLocaleTimeString()
+            };
+            
+            feedDatabase.unshift(post);
+            localStorage.setItem('acl_feed', JSON.stringify(feedDatabase));
+            document.getElementById('feed-post-text').value = '';
+            renderFeed();
+        }
+
+        function renderFeed() {
+            const container = document.getElementById('feed-items-container');
+            container.innerHTML = '';
+            
+            feedDatabase.forEach(post => {
+                const isOwner = post.role === 'OWNER';
+                const isAdmin = post.role === 'ADMIN';
+                const roleColor = isOwner ? 'text-amber-500' : (isAdmin ? 'text-emerald-500' : 'text-sky-500');
+                const borderColor = isOwner ? '#f59e0b' : (isAdmin ? '#10b981' : '#38bdf8');
+                
+                const card = document.createElement('div');
+                card.className = `glass-container p-5 feed-card bg-slate-900/40`;
+                card.style.borderLeftColor = borderColor;
+                
+                card.innerHTML = `
+                    <div class="flex items-center justify-between mb-3">
+                        <div class="flex items-center gap-2">
+                            <div class="w-6 h-6 rounded bg-slate-800 flex items-center justify-center text-[8px] font-black">${post.user[0]}</div>
+                            <div>
+                                <p class="text-[9px] font-black uppercase text-white">${post.user}</p>
+                                <p class="text-[6px] font-bold ${roleColor}">${post.role} • ${post.time}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="text-[11px] text-slate-300 leading-relaxed">${post.content}</p>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        // --- ID CARD CREATOR LOGIC ---
+        function setRole(role) {
+            currentRole = role;
+            ['member', 'admin', 'owner'].forEach(r => {
+                const btn = document.getElementById('role-' + r);
+                btn.classList.remove('bg-slate-700', 'text-white');
+                btn.classList.add('text-slate-500');
+            });
+            document.getElementById('role-' + role.toLowerCase()).classList.add('bg-slate-700', 'text-white');
+            document.getElementById('secure-auth').classList.toggle('hidden', role === 'MEMBER');
+            updateCardPreview();
+        }
+
+        function updateCardPreview() {
+            const name = document.getElementById('card-nama').value || 'USER IDENTITY';
+            document.getElementById('preview-nama').innerText = name.toUpperCase();
+            const rank = document.getElementById('preview-rank');
+            const card = document.getElementById('id-card-render');
+            
+            card.classList.remove('admin-card', 'owner-card');
+            if (currentRole === 'ADMIN') { card.classList.add('admin-card'); rank.innerText = 'OFFICIAL ADMIN'; }
+            else if (currentRole === 'OWNER') { card.classList.add('owner-card'); rank.innerText = 'SUPREME OWNER'; }
+            else { rank.innerText = 'VERIFIED MEMBER'; }
+            
+            document.getElementById('preview-uid').innerText = `UID-ACL-${name.slice(0,2).toUpperCase()}-${Math.floor(100+Math.random()*900)}`;
+        }
+
+        function saveToDatabase() {
+            const n = document.getElementById('card-nama').value;
+            const c = document.getElementById('acl-code').value;
+            if (!n) return alert("Masukkan Nama!");
+            
+            if (currentRole !== 'MEMBER' && c !== CODES[currentRole]) {
+                return alert("Passcode Otoritas Salah!");
+            }
+            
+            const uid = document.getElementById('preview-uid').innerText;
+            memberDatabase.push({ name: n.toUpperCase(), role: currentRole, uid: uid });
+            localStorage.setItem('acl_members', JSON.stringify(memberDatabase));
+            alert("ID Card berhasil diverifikasi dan disimpan ke database!");
+        }
+
+        function renderSecureList() {
+            const container = document.getElementById('member-items');
+            container.innerHTML = '';
+            
+            memberDatabase.slice().reverse().forEach(m => {
+                const isOwnerSession = activeAuthority && activeAuthority.role === 'OWNER';
+                const el = document.createElement('div');
+                el.className = 'p-4 bg-slate-900/80 border border-slate-800 rounded-2xl flex justify-between items-center';
+                el.innerHTML = `
+                    <div class="flex items-center gap-3">
+                        <div class="w-2 h-2 rounded-full ${m.role === 'OWNER' ? 'bg-amber-500' : (m.role === 'ADMIN' ? 'bg-emerald-500' : 'bg-sky-500')}"></div>
+                        <div>
+                            <p class="text-[10px] font-black text-white">${m.name}</p>
+                            <p class="text-[7px] text-slate-500 font-mono">${m.uid} [${m.role}]</p>
+                        </div>
+                    </div>
+                    ${(isOwnerSession && m.role === 'MEMBER') ? `<button onclick="revokeVerification('${m.uid}')" class="text-[8px] font-black text-rose-500 border border-rose-500/20 px-2 py-1 rounded">REVOKE</button>` : ''}
+                `;
+                container.appendChild(el);
+            });
+        }
+
+        function revokeVerification(uid) {
+            if(!confirm("Hapus data member ini?")) return;
+            memberDatabase = memberDatabase.filter(m => m.uid !== uid);
+            localStorage.setItem('acl_members', JSON.stringify(memberDatabase));
+            renderSecureList();
+        }
+
+        function generateIntroText() {
+            const n = document.getElementById('reg-nama').value;
+            if(!n) return alert("Isi Nama!");
+            if (!document.getElementById('reg-konsekuensi').checked) return alert("Setujui Konsekuensi!");
+            
+            const template = `〔 𝗔𝗖𝗟 𝗘𝗡𝗧𝗥𝗬 〕\n\nNAME: ${n.toUpperCase()}\nVERIFIED AT: ${new Date().toLocaleString()}\nSTATUS: SECURE.`;
+            document.getElementById('result-text').innerText = template;
+            document.getElementById('modal').style.display = 'flex';
+        }
+
+        function closeModal() { document.getElementById('modal').style.display = 'none'; }
+        
+        function downloadCard() {
+            html2canvas(document.getElementById('id-card-render'), { scale: 3 }).then(canvas => {
+                const link = document.createElement('a');
+                link.download = `ACL_IDENTITY_CARD.png`;
+                link.href = canvas.toDataURL();
+                link.click();
+            });
+        }
+    </script>
+</body>
+</html>
+
